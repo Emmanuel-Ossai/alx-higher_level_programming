@@ -2,11 +2,11 @@
 #include <Python.h>
 
 /**
- * print_python_bytes - Prints bytes information
- *
- * @p: Python Object
- * Return: no return
+ * print_python_bytes - a C function that prints bytes information
+ * @p: the Python object
+ * Return none
  */
+
 void print_python_bytes(PyObject *p)
 {
 	char *string;
@@ -48,10 +48,10 @@ start_loop:
 }
 
 /**
- * print_python_list - Prints list information
- *
- * @p: Python Object
- * Return: no return
+ * print_python_list - a C function that prints list information
+ * @p: the Python object
+ * Return: none
+
  */
 void print_python_list(PyObject *p)
 {
