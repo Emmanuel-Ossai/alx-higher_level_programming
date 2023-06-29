@@ -1,11 +1,23 @@
 #!/usr/bin/python3
 
 
+"""
+A module that defines the Square class.
+
+This module provides a class called Square and calculates its area.
+"""
+
+
 class Square:
-    """Represents a square."""
+    """Represents a square.
+
+    Attributes:
+        __size (int): Size of a side of the square.
+    """
 
     def __init__(self, size=0):
-        """Initializes a square.
+        """
+        Initializes a square.
 
         Args:
             size (int): Size of a side of the square. Default is 0.
@@ -20,25 +32,18 @@ class Square:
         self.size = size
 
     def area(self):
-        """Calculates the area of the square.
+        """
+        Calculates the area of the square.
 
         Returns:
-            int: The area of the square.ue is less than 0.
+            int: The area of the square.
         """
-        if not isinstance(value, int):
-            raise TypeError("size must be an integer")
-        elif value < 0:
-            raise ValueError("size must be >= 0")
-        else:
-            self.__size = value
-
-    def my
-    """ definition """
-    return self.size ** 2
+        return self.size ** 2
 
     @property
     def size(self):
-        """Getter for the size attribute.
+        """
+        Getter for the size attribute.
 
         Returns:
             int: The size of the square.
@@ -47,18 +52,29 @@ class Square:
 
     @size.setter
     def size(self, value):
-        """Setter for the size attribute.
+        """
+        Setter for the size attribute.
 
         Args:
             value (int): The size of a side of the square.
 
         Returns:
-        None
+            None
 
         Raises:
             TypeError: If value is not an integer.
-            ValueError: If val_print(self):
-        """Prints the square.
+            ValueError: If value is less than 0.
+        """
+        if not isinstance(value, int):
+            raise TypeError("size must be an integer")
+        elif value < 0:
+            raise ValueError("size must be >= 0")
+        else:
+            self.__size = value
+
+    def my_print(self):
+        """
+        Prints the square.
 
         Returns:
             None
