@@ -1,159 +1,144 @@
 #!/usr/bin/python3
-"""101-nqueens finds all possible solutions the N queens puzzle, including
-translations and reflections.
 
-Attempted virtual backtracking without recursion. In local tests process will
-start to slow down visibly for N > 8, and is successful up to N = 11 but
-will be killed if used for N > 11. Recursion could allow for a lighter weight
-process, but it's not yet apparent to this student how to retain a record of
-which solutions are already derived with that method.
+"""Solves the N-queens puzzle.
+
+This determines all possible solutions to NxN chessboard.
+
+N must be an integer greater than or equal to 4.
 
 Attributes:
-    N (int): base number of queens, and length of board side in piece positions
-    candidates (list) of (list) of (list) of (int): list of all successful
-        solutions for given amount of columns checked
+    chessboard (list): A list of lists representing the chessboard.
+    solutions (list): A list of lists containing solutions.
 
+Solutions are represented in the format [[r, c], [r, c], [r, c], [r, c]]
+where `r` and `c` represent the row and column, respectively, where
+a queen must be placed on the chessboard.
 """
-from sys import argv
 
-if len(argv) is not 2:
-    print('Usage: nqueens N')
-    exit(1)
-
-if not argv[1].isdigit():
-    print('N must be a number')
-    exit(1)
-
-N = int(argv[1])
-
-if N < 4:
-    print('N must be at least 4')
-    exit(1)
+import sys
 
 
-def board_column_gen(board=[]):
-    """Adds a column of zeroes to the right of any board about to be tested for
-    queen arrangements in that column.
+def initialize_chessboard(n):
+    """Initialize an `n`x`n` sized chessboard with empty squares.
 
     Args:
-        board (list) of (list) of (int): 2D list of ints, only as wide as
-        needed to test the rightmost column for queen conflicts.
+        n (int): The size of the chessboard.
 
     Returns:
-        modified 2D list
-
+        list: The initialized chessboard.
     """
-    if len(board):
-        for row in board:
-            row.append(0)
-    else:
-        for row in range(N):
-            board.append([0])
-    return bo"
-    x = row
-    y = col
-
-    for i in range(1, N):
-        if (y - i) >= 0:
-            # check up-left diagonal
-            if (x - i) >= 0:
-                if board[x - i][y - i]:
-                    return False
-            # check left
-            if board[x][y - i]:
-                return False
-            # check down-left diagonal
-            if (x + i) < N:
-                if board[x + i][y - i]:
-                    return False
-    return True
+    chessboard = [[' '] * n for _ in range(n)]
+    return chessboard
 
 
-def coordinate_format(candidates):
-    """Converts a board (matrix of 1 and 0) into a series of row/column
-    indicies of each queen/1.
+def deepcopy_chessboard(chessboard):
+    """Return a deep copy of a chessboard.
 
     Args:
-    candidates (list) of (list) of (list) of (int): list of all successful
-        solutions for amount of columns last checked
-
-    Attributes:
-        holberton (list) of (list) of (int): each member list contains the row
-    column number for each queen found
+        chessboard (list): The chessboard to be copied.
 
     Returns:
-        holberton, the list of coordinates
-
+        list: The copied chessboard.
     """
-    holberton = []
-    for x, attempt in enumerate(candidates):
-        holberton.append([])
-        for i, row in enumerate(attempt):
-            holberton[x].append([])
-            for j, col in enumerate(row):
-               ard
+    return [row.copy() for row in chessboard]
 
 
-def add_queen(board, row, col):
-    """Sets "queen," or 1, to coordinates given in board.
+def get_solution(chessboard):
+    """Return the list of lists representation of a solved chessboard.
 
     Args:
-        board (list) of (list) of (int): 2D list of ints, only as wide as
-            needed to test the rightmost column for queen conflicts.
-        row (int): first dimension index
-        col (int): second dimension index
-
-    """
-    board[row][col] = 1
-
-
-def new_queen_safe(board, row, col):
-    """For the board given, checks that for a new queen placed in the rightmost
-    column, there are no other "queen"s, or 1 values, in the martix to the
-    left, and diagonally up-left and down-left.
-
-    Args:
-        board (list) of (list) of (int): 2D list of ints, only as wide as
-            needed to test the rightmost column for queen conflicts.
-        row (int): first dimension index
-        col (int): second dimension index
+        chessboard (list): The chessboard containing the solution.
 
     Returns:
-        True if no left side conflicts found for new queen, or False if a
-    conflict is found.
+        list: The list of lists representation of the solution.
+    """
+    solution = []
+    for r in range(len(chessboard)):
+        for c in range(len(chessboard)):
+            if chessboard[r][c] == "Q":
+                solution.append([r, c])
+                break
+    return solution
 
-    "" if col:
-                    holberton[x][i].append(i)
-                    holberton[x][i].append(j)
-    return holberton
 
-# init candidates list with first column of 0s
-candidates = []
-candidates.append(board_column_gen())
+def mark_unavailable_spots(chessboard, row, col):
+    """Mark the spots on the chessboard where non-attacking queens
+    cannot be placed.
 
-# proceed column by column, testing the rightmost
-for col in range(N):
-    # start a new generation of the candidate list for every round of testing
-    new_candidates = []
-    # test each candidate from previous round, at current column
-    for matrix in candidates:
-        # for every row in that candidate's rightmost column
-        for row in range(N):
-            # are there any conflicts in placing a queen at those coordinates?
-            if new_queen_safe(matrix, row, col):
-                # no? then create a "child" (copy) of that candidate
-                temp = [line[:] for line in matrix]
-                # place a queen in that position
-                add_queen(temp, row, col)
-                # and unless you're in the last round of testing,
-                if col < N - 1:
-                    # add a new column of 0s on the right for the next round
-                    board_column_gen(temp)
-                # add that new candidate to this round's list of successes
-                new_candidates.append(temp)
-    # when finished with the round, discard the "parent" candidates
-    candidates = new_candidates
+    Args:
+        chessboard (list): The current working chessboard.
+        row (int): The row where a queen was last placed.
+        col (int): The column where a queen was last placed.
+    """
+    n = len(chessboard)
+    # Mark all forward spots
+    for c in range(col + 1, n):
+        chessboard[row][c] = "x"
+    # Mark all backward spots
+    for c in range(col - 1, -1, -1):
+        chessboard[row][c] = "x"
+    # Mark all spots below
+    for r in range(row + 1, n):
+        chessboard[r][col] = "x"
+    # Mark all spots above
+    for r in range(row - 1, -1, -1):
+        chessboard[r][col] = "x"
+        # Mark all spots diagonally down to the right
+    for r, c in zip(range(row + 1, n), range(col + 1, n)):
+        chessboard[r][c] = "x"
+    # Mark all spots diagonally up to the left
+    for r, c in zip(range(row - 1, -1, -1), range(col - 1, -1, -1)):
+        chessboard[r][c] = "x"
+    # Mark all spots diagonally up to the right
+    for r, c in zip(range(row - 1, -1, -1), range(col + 1, n)):
+        chessboard[r][c] = "x"
+    # Mark all spots diagonally down to the left
+    for r, c in zip(range(row + 1, n), range(col - 1, -1, -1)):
+        chessboard[r][c] = "x"
 
-# format results to match assignment output
-for item in coordinate_format(candidates):
-    print(item)
+
+def solve_nqueens(chessboard, row, queens, solutions):
+    """Recursively solve the N-queens puzzle.
+
+    Args:
+        chessboard (list): The current working chessboard.
+        row (int): The current working row.
+        queens (int): The current number of placed queens.
+        solutions (list): A list of lists to store the solutions.
+
+    Returns:
+        list: A list of lists containing all solutions.
+    """
+    n = len(chessboard)
+
+    if queens == n:
+        solutions.append(get_solution(chessboard))
+        return solutions
+
+    for col in range(n):
+        if chessboard[row][col] == " ":
+            temp_chessboard = deepcopy_chessboard(chessboard)
+            temp_chessboard[row][col] = "Q"
+            mark_unavailable_spots(temp_chessboard, row, col)
+            solutions = solve_nqueens(
+                    temp_chessboard, row + 1, queens + 1, solutions)
+
+    return solutions
+
+
+if __name__ == "__main__":
+    if len(sys.argv) != 2:
+        print("Usage: nqueens N")
+        sys.exit(1)
+    if not sys.argv[1].isdigit():
+        print("N must be a number")
+        sys.exit(1)
+    n = int(sys.argv[1])
+    if n < 4:
+        print("N must be at least 4")
+        sys.exit(1)
+
+    chessboard = initialize_chessboard(n)
+    solutions = solve_nqueens(chessboard, 0, 0, [])
+    for sol in solutions:
+        print(sol)
