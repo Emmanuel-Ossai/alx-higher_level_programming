@@ -1,3 +1,10 @@
+#!/usr/bin/python3
+
+"""
+This is a python code that contains lookup function
+"""
+
+
 def lookup(obj):
 
     """
