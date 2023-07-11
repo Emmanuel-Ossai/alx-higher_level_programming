@@ -21,8 +21,8 @@ class MyList(list):
         """
         super().__init__()
 
-        def print_sorted(self):
-            """
-            Prints the list in sorted (ascending) order.
-            """
-            print(sorted(self))
+    def print_sorted(self):
+        """
+        Prints the list in sorted (ascending) order.
+        """
+        print(sorted(self))
