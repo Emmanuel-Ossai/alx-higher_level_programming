@@ -7,49 +7,38 @@ Contains a script that reads stdin line by line and computes metrics
 
 
 import sys
-import signal
 
+file_size = 0
+status_tally = {"200": 0, "301": 0, "400": 0, "401": 0,
+                "403": 0, "404": 0, "405": 0, "500": 0}
+i = 0
+try:
+    for line in sys.stdin:
+        tokens = line.split()
+        if len(tokens) >= 2:
+            a = i
+            if tokens[-2] in status_tally:
+                status_tally[tokens[-2]] += 1
+                i += 1
+            try:
+                file_size += int(tokens[-1])
+                if a == i:
+                    i += 1
+            except FileNotFoundError:
+                if a == i:
+                    continue
+        if i % 10 == 0:
+            print("File size: {:d}".format(file_size))
+            for key, value in sorted(status_tally.items()):
+                if value:
+                    print("{:s}: {:d}".format(key, value))
+    print("File size: {:d}".format(file_size))
+    for key, value in sorted(status_tally.items()):
+        if value:
+            print("{:s}: {:d}".format(key, value))
 
-def compute_metrics():
-    """
-    Read stdin line by line and compute metrics.
-    Print statistics every 10 lines or after a keyboard
-    interruption (CTRL + C).
-
-    """
-    total_file_size = 0
-    status_codes = {}
-
-    try:
-        for i, line in enumerate(sys.stdin, start=1):
-            ip_address, _, _, status_code, file_size = line.strip().split(' ')
-
-            total_file_size += int(file_size)
-
-            if status_code in status_codes:
-                status_codes[status_code] += 1
-            else:
-                status_codes[status_code] = 1
-
-            if i % 10 == 0:
-                print_stats(total_file_size, status_codes)
-
-    except KeyboardInterrupt:
-        print_stats(total_file_size, status_codes)
-
-
-def print_stats(total_file_size, status_codes):
-    """
-    Print the computed statistics
-
-    """
-    print("Total file size:", total_file_size)
-    for code in sorted(status_codes.keys()):
-        print(code + ":", status_codes[code])
-
-
-# Register the signal handler for keyboard interruption
-signal.signal(signal.SIGINT, lambda sig, frame: print_stats(0, {}))
-
-# Call the compute_metrics function
-compute_metrics()
+except KeyboardInterrupt:
+    print("File size: {:d}".format(file_size))
+    for key, value in sorted(status_tally.items()):
+        if value:
+            print("{:s}: {:d}".format(key, value))
